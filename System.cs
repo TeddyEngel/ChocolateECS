@@ -19,9 +19,24 @@ namespace ChocolateECS
 
         public abstract void OnStart();
 
+        public virtual void OnEnable()
+        {
+            
+        }
+
         public abstract void OnUpdate();
 
         public abstract void OnFixedUpdate();
+
+        public virtual void OnDisable()
+        {
+
+        }
+
+        public virtual void OnDestroy()
+        {
+
+        }
 
         protected SecondaryComponentType[] RequireSecondaryComponent<SecondaryComponentType>()
         {

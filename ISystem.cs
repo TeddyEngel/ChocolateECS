@@ -6,7 +6,10 @@ namespace ChocolateECS
     {
         void OnAwake(List<ISystem> systems);
         void OnStart();
+        void OnEnable();
         void OnUpdate();
         void OnFixedUpdate();
+        void OnDisable();
+        void OnDestroy();
     }
 }

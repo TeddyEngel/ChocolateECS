@@ -9,10 +9,16 @@ namespace ChocolateECS
         int countAwakeSystems;
         List<ISystem> startSystems = new List<ISystem>();
         int countStartSystems;
+        List<ISystem> enableSystems = new List<ISystem>();
+        int countEnableSystems;
         List<ISystem> updateSystems = new List<ISystem>();
         int countUpdateSystems;
         List<ISystem> fixedUpdateSystems = new List<ISystem>();
         int countFixedUpdateSystems;
+        List<ISystem> disableSystems = new List<ISystem>();
+        int countDisableSystems;
+        List<ISystem> destroySystems = new List<ISystem>();
+        int countDestroySystems;
 
         public virtual void Awake()
         {
@@ -24,6 +30,12 @@ namespace ChocolateECS
         {
             for (int i = 0; i < countStartSystems; ++i)
                 startSystems[i].OnStart();
+        }
+
+        public virtual void Enable()
+        {
+            for (int i = 0; i < countEnableSystems; ++i)
+                enableSystems[i].OnStart();
         }
     	
     	public virtual void Update()
@@ -38,6 +50,18 @@ namespace ChocolateECS
                 fixedUpdateSystems[i].OnFixedUpdate();
         }
 
+        public virtual void Disable()
+        {
+            for (int i = 0; i < countDisableSystems; ++i)
+                disableSystems[i].OnStart();
+        }
+
+        public virtual void Destroy()
+        {
+            for (int i = 0; i < countDestroySystems; ++i)
+                destroySystems[i].OnStart();
+        }
+
         protected void RegisterSystem(ISystem system, BootstrapperPermission permission)
         {
             if ((permission & BootstrapperPermission.Awake) == BootstrapperPermission.Awake)
@@ -50,6 +74,11 @@ namespace ChocolateECS
                 startSystems.Add(system);
                 ++countStartSystems;
             }
+            if ((permission & BootstrapperPermission.Enable) == BootstrapperPermission.Enable)
+            {
+                enableSystems.Add(system);
+                ++countEnableSystems;
+            }
             if ((permission & BootstrapperPermission.Update) == BootstrapperPermission.Update)
             {
                 updateSystems.Add(system);
@@ -59,6 +88,16 @@ namespace ChocolateECS
             {
                 fixedUpdateSystems.Add(system);
                 ++countFixedUpdateSystems;
+            }
+            if ((permission & BootstrapperPermission.Disable) == BootstrapperPermission.Disable)
+            {
+                disableSystems.Add(system);
+                ++countDisableSystems;
+            }
+            if ((permission & BootstrapperPermission.Destroy) == BootstrapperPermission.Destroy)
+            {
+                destroySystems.Add(system);
+                ++countDestroySystems;
             }
         }
     }
