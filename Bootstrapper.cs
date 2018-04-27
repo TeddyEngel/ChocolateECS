@@ -32,10 +32,10 @@ namespace ChocolateECS
                 startSystems[i].OnStart();
         }
 
-        public virtual void Enable()
+        public virtual void OnEnable()
         {
             for (int i = 0; i < countEnableSystems; ++i)
-                enableSystems[i].OnStart();
+                enableSystems[i].OnEnable();
         }
     	
     	public virtual void Update()
@@ -50,16 +50,16 @@ namespace ChocolateECS
                 fixedUpdateSystems[i].OnFixedUpdate();
         }
 
-        public virtual void Disable()
+        public virtual void OnDisable()
         {
             for (int i = 0; i < countDisableSystems; ++i)
-                disableSystems[i].OnStart();
+                disableSystems[i].OnDisable();
         }
 
-        public virtual void Destroy()
+        public virtual void OnDestroy()
         {
             for (int i = 0; i < countDestroySystems; ++i)
-                destroySystems[i].OnStart();
+                destroySystems[i].OnDestroy();
         }
 
         protected void RegisterSystem(ISystem system, BootstrapperPermission permission)

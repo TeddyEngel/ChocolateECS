@@ -17,16 +17,25 @@ namespace ChocolateECS
             countMainComponents = mainComponents.Length;
         }
 
-        public abstract void OnStart();
+        public virtual void OnStart()
+        {
+            
+        }
 
         public virtual void OnEnable()
         {
             
         }
 
-        public abstract void OnUpdate();
+        public virtual void OnUpdate()
+        {
 
-        public abstract void OnFixedUpdate();
+        }
+
+        public virtual void OnFixedUpdate()
+        {
+
+        }
 
         public virtual void OnDisable()
         {
