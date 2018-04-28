@@ -1,5 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Reflection;
+
+public class ReflectionUtilities
+{   
+   public static bool IsOverride(MethodInfo method)
+   {
+      return ! method.Equals(method.GetBaseDefinition());
+   }
+}
 
 namespace ChocolateECS
 {
@@ -62,39 +72,48 @@ namespace ChocolateECS
                 destroySystems[i].OnDestroy();
         }
 
-        protected void RegisterSystem(ISystem system, BootstrapperPermission permission)
+        protected void RegisterSystem(ISystem system)
         {
-            if ((permission & BootstrapperPermission.Awake) == BootstrapperPermission.Awake)
+            Type systemType = system.GetType();
+
+            MethodInfo awakeInfo = systemType.GetMethod("OnAwake", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(List<ISystem> )}, null);
+            if (awakeInfo != null && ReflectionUtilities.IsOverride(awakeInfo))
             {
                 awakeSystems.Add(system);
                 ++countAwakeSystems;
             }
-            if ((permission & BootstrapperPermission.Start) == BootstrapperPermission.Start)
+            MethodInfo startInfo = systemType.GetMethod("OnStart", BindingFlags.Instance | BindingFlags.Public);
+            if (startInfo != null && ReflectionUtilities.IsOverride(startInfo))
             {
                 startSystems.Add(system);
                 ++countStartSystems;
             }
-            if ((permission & BootstrapperPermission.Enable) == BootstrapperPermission.Enable)
+            MethodInfo enableInfo = systemType.GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.Public);
+            if (enableInfo != null && ReflectionUtilities.IsOverride(enableInfo))
             {
                 enableSystems.Add(system);
                 ++countEnableSystems;
             }
-            if ((permission & BootstrapperPermission.Update) == BootstrapperPermission.Update)
+            MethodInfo updateInfo = systemType.GetMethod("OnUpdate", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(float) }, null);
+            if (updateInfo != null && ReflectionUtilities.IsOverride(updateInfo))
             {
                 updateSystems.Add(system);
                 ++countUpdateSystems;
             }
-            if ((permission & BootstrapperPermission.FixedUpdate) == BootstrapperPermission.FixedUpdate)
+            MethodInfo fixedUpdateInfo = systemType.GetMethod("OnFixedUpdate", BindingFlags.Instance | BindingFlags.Public);
+            if (fixedUpdateInfo != null && ReflectionUtilities.IsOverride(fixedUpdateInfo))
             {
                 fixedUpdateSystems.Add(system);
                 ++countFixedUpdateSystems;
             }
-            if ((permission & BootstrapperPermission.Disable) == BootstrapperPermission.Disable)
+            MethodInfo disableInfo = systemType.GetMethod("OnDisable", BindingFlags.Instance | BindingFlags.Public);
+            if (disableInfo != null && ReflectionUtilities.IsOverride(disableInfo))
             {
                 disableSystems.Add(system);
                 ++countDisableSystems;
             }
-            if ((permission & BootstrapperPermission.Destroy) == BootstrapperPermission.Destroy)
+            MethodInfo destroyInfo = systemType.GetMethod("OnDestroy", BindingFlags.Instance | BindingFlags.Public);
+            if (destroyInfo != null && ReflectionUtilities.IsOverride(destroyInfo))
             {
                 destroySystems.Add(system);
                 ++countDestroySystems;
