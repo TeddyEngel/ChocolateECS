@@ -41,7 +41,7 @@ namespace ChocolateECS
     	public virtual void Update()
         {
             for (int i = 0; i < countUpdateSystems; ++i)
-                updateSystems[i].OnUpdate();
+                updateSystems[i].OnUpdate(Time.deltaTime);
     	}
 
         public virtual void FixedUpdate()
