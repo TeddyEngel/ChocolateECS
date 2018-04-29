@@ -32,6 +32,11 @@ namespace ChocolateECS
 
         }
 
+        public virtual void OnLateUpdate(float deltaTime)
+        {
+
+        }
+
         public virtual void OnFixedUpdate()
         {
 

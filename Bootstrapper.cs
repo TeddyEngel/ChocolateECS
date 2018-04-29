@@ -23,6 +23,8 @@ namespace ChocolateECS
         int countEnableSystems;
         List<ISystem> updateSystems = new List<ISystem>();
         int countUpdateSystems;
+        List<ISystem> lateUpdateSystems = new List<ISystem>();
+        int countLateUpdateSystems;
         List<ISystem> fixedUpdateSystems = new List<ISystem>();
         int countFixedUpdateSystems;
         List<ISystem> disableSystems = new List<ISystem>();
@@ -53,6 +55,12 @@ namespace ChocolateECS
             for (int i = 0; i < countUpdateSystems; ++i)
                 updateSystems[i].OnUpdate(Time.deltaTime);
     	}
+
+        public virtual void LateUpdate()
+        {
+            for (int i = 0; i < countLateUpdateSystems; ++i)
+                lateUpdateSystems[i].OnLateUpdate(Time.deltaTime);
+        }
 
         public virtual void FixedUpdate()
         {
@@ -99,6 +107,12 @@ namespace ChocolateECS
             {
                 updateSystems.Add(system);
                 ++countUpdateSystems;
+            }
+            MethodInfo lateUpdateInfo = systemType.GetMethod("OnLateUpdate", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(float) }, null);
+            if (lateUpdateInfo != null && ReflectionUtilities.IsOverride(lateUpdateInfo))
+            {
+                lateUpdateSystems.Add(system);
+                ++countLateUpdateSystems;
             }
             MethodInfo fixedUpdateInfo = systemType.GetMethod("OnFixedUpdate", BindingFlags.Instance | BindingFlags.Public);
             if (fixedUpdateInfo != null && ReflectionUtilities.IsOverride(fixedUpdateInfo))

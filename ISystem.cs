@@ -8,6 +8,7 @@ namespace ChocolateECS
         void OnStart();
         void OnEnable();
         void OnUpdate(float deltaTime);
+        void OnLateUpdate(float deltaTime);
         void OnFixedUpdate();
         void OnDisable();
         void OnDestroy();
