@@ -5,10 +5,11 @@ namespace ChocolateECS
 {
     public class GameObjectFactory
     {
-        public Action<GameObject> OnGameObjectInstantiated;
-        public Action<GameObject> OnGameObjectDestroyed;
+        public static Action<GameObject> OnGameObjectInstantiated;
+        public static Action<GameObject> OnGameObjectPreDestroyed;
+        public static Action<GameObject> OnGameObjectPostDestroyed;
 
-        public GameObject Instantiate(GameObject gameObject)
+        public static GameObject Instantiate(GameObject gameObject)
         {
             if (gameObject == null)
                 throw new ArgumentException();
@@ -18,13 +19,15 @@ namespace ChocolateECS
             return go;
         }
 
-        public void DestroyImmediate(GameObject gameObject)
+        public static void DestroyImmediate(GameObject gameObject)
         {
             if (gameObject == null)
                 throw new ArgumentException();
-            if (OnGameObjectDestroyed != null)
-                OnGameObjectDestroyed(gameObject);
+            if (OnGameObjectPreDestroyed != null)
+                OnGameObjectPreDestroyed(gameObject);
             GameObject.DestroyImmediate(gameObject);
+            if (OnGameObjectPostDestroyed != null)
+                OnGameObjectPostDestroyed(gameObject);
         }
     }
 }

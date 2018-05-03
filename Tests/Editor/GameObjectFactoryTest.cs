@@ -8,25 +8,10 @@ using ChocolateECS;
 
 public class GameObjectFactoryTest
 {
-	GameObjectFactory _gameObjectFactory;
-
-
-	[SetUp] public void SetUp()
-    {
-    	_gameObjectFactory = new GameObjectFactory();
-    }
-
-	[Test]
-	public void GameObjectFactory_CanBeInstantiated() 
-	{
-		var newFactory = new GameObjectFactory();
-		Assert.NotNull(newFactory);
-	}
-
 	[Test]
 	public void Instantiate_WithNullGameObject_ThrowsArgumentException() 
 	{
-		Assert.Throws<ArgumentException>(() => { _gameObjectFactory.Instantiate(null); });
+		Assert.Throws<ArgumentException>(() => { GameObjectFactory.Instantiate(null); });
 	}
 
 	[Test]
@@ -34,14 +19,14 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 
-		Assert.IsNotNull(_gameObjectFactory.Instantiate(go));
+		Assert.IsNotNull(GameObjectFactory.Instantiate(go));
 	}
 
 	[Test]
 	public void Instantiate_WithValidGameObject_ReturnsANewGameObject() 
 	{
 		GameObject go = new GameObject();
-		GameObject newGo = _gameObjectFactory.Instantiate(go);
+		GameObject newGo = GameObjectFactory.Instantiate(go);
 
 		Assert.AreNotEqual(go.GetInstanceID(), newGo.GetInstanceID());
 	}
@@ -51,11 +36,11 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		bool eventTriggered = false;
-		_gameObjectFactory.OnGameObjectInstantiated += (eventGo) => {
+		GameObjectFactory.OnGameObjectInstantiated += (eventGo) => {
 			eventTriggered = true;
 		};
 		
-		GameObject newGo = _gameObjectFactory.Instantiate(go);
+		GameObject newGo = GameObjectFactory.Instantiate(go);
 
 		Assert.IsTrue(eventTriggered);
 	}
@@ -65,17 +50,17 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		
-		_gameObjectFactory.OnGameObjectInstantiated += (eventGo) => {
+		GameObjectFactory.OnGameObjectInstantiated += (eventGo) => {
 			Assert.AreNotEqual(go.GetInstanceID(), eventGo.GetInstanceID());
 		};
 		
-		GameObject newGo = _gameObjectFactory.Instantiate(go);
+		GameObject newGo = GameObjectFactory.Instantiate(go);
 	}
 
 	[Test]
 	public void DestroyImmediate_WithNullGameObject_ThrowsArgumentException() 
 	{
-		Assert.Throws<ArgumentException>(() => { _gameObjectFactory.DestroyImmediate(null); });
+		Assert.Throws<ArgumentException>(() => { GameObjectFactory.DestroyImmediate(null); });
 	}
 
 	// TODO: This test doesn't seem to evaluate correctly
@@ -84,35 +69,62 @@ public class GameObjectFactoryTest
 	// {
 	// 	GameObject go = new GameObject();
 
-	// 	_gameObjectFactory.DestroyImmediate(go);
+	// 	GameObjectFactory.DestroyImmediate(go);
 
 	// 	Assert.AreEqual(go, null);
 	// }
 
 	[Test]
-	public void DestroyImmediate_WithValidGameObject_TriggersOnGameObjectDestroyed() 
+	public void DestroyImmediate_WithValidGameObject_TriggersOnGameObjectPreDestroyed() 
 	{
 		GameObject go = new GameObject();
 		bool eventTriggered = false;
-		_gameObjectFactory.OnGameObjectDestroyed += (eventGo) => {
+		GameObjectFactory.OnGameObjectPreDestroyed += (eventGo) => {
 			eventTriggered = true;
 		};
 		
-		_gameObjectFactory.DestroyImmediate(go);
+		GameObjectFactory.DestroyImmediate(go);
 
 		Assert.IsTrue(eventTriggered);
 	}
 
 	[Test]
-	public void DestroyImmediate_WithValidGameObject_TriggersOnGameObjectDestroyedWithGameObject() 
+	public void DestroyImmediate_WithValidGameObject_TriggersOnGameObjectPreDestroyedWithGameObject() 
 	{
 		GameObject go = new GameObject();
 		
-		_gameObjectFactory.OnGameObjectDestroyed += (eventGo) => {
+		GameObjectFactory.OnGameObjectPreDestroyed += (eventGo) => {
 			Assert.AreEqual(go.GetInstanceID(), eventGo.GetInstanceID());
 		};
 		
-		_gameObjectFactory.DestroyImmediate(go);
+		GameObjectFactory.DestroyImmediate(go);
 	}
+
+	[Test]
+	public void DestroyImmediate_WithValidGameObject_TriggersOnGameObjectPostDestroyed() 
+	{
+		GameObject go = new GameObject();
+		bool eventTriggered = false;
+		GameObjectFactory.OnGameObjectPostDestroyed += (eventGo) => {
+			eventTriggered = true;
+		};
+		
+		GameObjectFactory.DestroyImmediate(go);
+
+		Assert.IsTrue(eventTriggered);
+	}
+
+	// TODO: Enable when I know what to test against
+	// [Test]
+	// public void DestroyImmediate_WithValidGameObject_TriggersOnGameObjectPostDestroyedWithGameObject() 
+	// {
+	// 	GameObject go = new GameObject();
+		
+	// 	GameObjectFactory.OnGameObjectPostDestroyed += (eventGo) => {
+	// 		Assert.AreEqual(go.GetInstanceID(), eventGo.GetInstanceID());
+	// 	};
+		
+	// 	GameObjectFactory.DestroyImmediate(go);
+	// }
 }
 

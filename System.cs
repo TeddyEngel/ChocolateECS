@@ -10,9 +10,15 @@ namespace ChocolateECS
         protected int countMainComponents;
         Dictionary<Type, System.Object[]> secondaryComponents = new Dictionary<Type, System.Object[]>();
 
-        public Action OnComponentDestroyed
+        public void OnGameObjectPreDestroyed(GameObject gameObject)
         {
-            get; set;
+            // TODO: Remove gameObject from mainComponents / secondaryComponents only where the type matches
+        }
+
+        public void OnGameObjectPostDestroyed(GameObject gameObject)
+        {
+            // TODO: Eventually, only refresh components with the same type as gameObject
+            RefreshComponents();
         }
 
         public void RefreshComponents()
@@ -106,7 +112,6 @@ namespace ChocolateECS
             if (!secondaryComponents.ContainsKey(classType))
                 return null;
             return secondaryComponents[classType] as SecondaryComponentType[];
-        }
-        
+        }        
     }
 }

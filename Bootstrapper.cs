@@ -155,25 +155,14 @@ namespace ChocolateECS
 
         void RegisterSystemHandlers(ISystem system)
         {
-            system.OnComponentDestroyed += OnComponentDestroyed;
+            GameObjectFactory.OnGameObjectPreDestroyed += system.OnGameObjectPreDestroyed;
+            GameObjectFactory.OnGameObjectPostDestroyed += system.OnGameObjectPostDestroyed;
         }
 
         void UnregisterSystemHandlers(ISystem system)
         {
-            system.OnComponentDestroyed -= OnComponentDestroyed;
-        }
-
-        // If an entity is destroyed OR an entity loses / adds a new component, the lists should update in all relevant lists
-        void RefreshSystemComponents()
-        {
-            // Ideally this should only refresh systems using the component given
-            for (int i = 0; i < countAllSystems; ++i)
-                allSystems[i].RefreshComponents();
-        }
-
-        void OnComponentDestroyed()
-        {
-            RefreshSystemComponents();
+            GameObjectFactory.OnGameObjectPreDestroyed -= system.OnGameObjectPreDestroyed;
+            GameObjectFactory.OnGameObjectPostDestroyed -= system.OnGameObjectPostDestroyed;
         }
     }
 }
