@@ -10,11 +10,31 @@ namespace ChocolateECS
         protected int countMainComponents;
         Dictionary<Type, System.Object[]> secondaryComponents = new Dictionary<Type, System.Object[]>();
 
-        public virtual void OnAwake(List<ISystem> systems)
+        public Action OnComponentDestroyed
         {
-            // Find primary components
+            get; set;
+        }
+
+        public void RefreshComponents()
+        {
+            UpdateMainComponents();
+            RefreshMainComponents();
+            secondaryComponents.Clear();
+            RefreshSecondaryComponents();
+        }
+
+        void UpdateMainComponents()
+        {
             mainComponents = GameObject.FindObjectsOfType(typeof(MainComponentType)) as MonoBehaviour[];
             countMainComponents = mainComponents.Length;
+        }
+
+        protected abstract void RefreshMainComponents();
+        protected abstract void RefreshSecondaryComponents();
+
+        public virtual void OnAwake(List<ISystem> systems)
+        {
+            RefreshComponents();
         }
 
         public virtual void OnStart()

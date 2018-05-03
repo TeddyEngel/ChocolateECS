@@ -7,7 +7,7 @@ public class ReflectionUtilities
 {   
    public static bool IsOverride(MethodInfo method)
    {
-      return ! method.Equals(method.GetBaseDefinition());
+      return !method.Equals(method.GetBaseDefinition());
    }
 }
 
@@ -15,6 +15,8 @@ namespace ChocolateECS
 {
     public abstract class Bootstrapper : MonoBehaviour
     {
+        List<ISystem> allSystems = new List<ISystem>();
+        int countAllSystems;
         List<ISystem> awakeSystems = new List<ISystem>();
         int countAwakeSystems;
         List<ISystem> startSystems = new List<ISystem>();
@@ -78,11 +80,16 @@ namespace ChocolateECS
         {
             for (int i = 0; i < countDestroySystems; ++i)
                 destroySystems[i].OnDestroy();
+            // NOTE: Might need to move that before OnDestroy if systems start destroying game objects when they get destroyed
+            UnregisterSystems();
         }
 
         protected void RegisterSystem(ISystem system)
         {
             Type systemType = system.GetType();
+
+            allSystems.Add(system);
+            ++countAllSystems;
 
             MethodInfo awakeInfo = systemType.GetMethod("OnAwake", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(List<ISystem> )}, null);
             if (awakeInfo != null && ReflectionUtilities.IsOverride(awakeInfo))
@@ -132,6 +139,41 @@ namespace ChocolateECS
                 destroySystems.Add(system);
                 ++countDestroySystems;
             }
+
+            RegisterSystemHandlers(system);
+        }
+
+        void UnregisterSystems()
+        {
+            for (int i = 0; i < countAllSystems; ++i)
+            {
+                ISystem system = allSystems[i];
+
+                UnregisterSystemHandlers(system);
+            }
+        }
+
+        void RegisterSystemHandlers(ISystem system)
+        {
+            system.OnComponentDestroyed += OnComponentDestroyed;
+        }
+
+        void UnregisterSystemHandlers(ISystem system)
+        {
+            system.OnComponentDestroyed -= OnComponentDestroyed;
+        }
+
+        // If an entity is destroyed OR an entity loses / adds a new component, the lists should update in all relevant lists
+        void RefreshSystemComponents()
+        {
+            // Ideally this should only refresh systems using the component given
+            for (int i = 0; i < countAllSystems; ++i)
+                allSystems[i].RefreshComponents();
+        }
+
+        void OnComponentDestroyed()
+        {
+            RefreshSystemComponents();
         }
     }
 }

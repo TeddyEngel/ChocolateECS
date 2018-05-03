@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,6 +6,11 @@ namespace ChocolateECS
 {
     public abstract class SingletonSystem : ISystem
     {
+        public Action OnComponentDestroyed
+        {
+            get; set;
+        }
+
         public virtual void OnAwake(List<ISystem> systems)
         {
         }
@@ -43,5 +49,10 @@ namespace ChocolateECS
         {
 
         }        
+
+        public void RefreshComponents()
+        {
+            
+        }
     }
 }
