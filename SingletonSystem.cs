@@ -6,6 +6,11 @@ namespace ChocolateECS
 {
     public abstract class SingletonSystem : ISystem
     {
+        public void OnGameObjectInstantiated(GameObject gameObject)
+        {
+
+        }
+
         public void OnGameObjectPreDestroyed(GameObject gameObject)
         {
 

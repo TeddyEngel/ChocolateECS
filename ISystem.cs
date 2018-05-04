@@ -5,11 +5,12 @@ using UnityEngine;
 namespace ChocolateECS
 {
     public interface ISystem
-    {        
+    {
+        void OnGameObjectInstantiated(GameObject gameObject);
         void OnGameObjectPreDestroyed(GameObject gameObject);
         void OnGameObjectPostDestroyed(GameObject gameObject);
         void RefreshComponents();
-        
+
         void OnAwake(List<ISystem> systems);
         void OnStart();
         void OnEnable();

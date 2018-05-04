@@ -10,9 +10,59 @@ namespace ChocolateECS
         protected int countMainComponents;
         Dictionary<Type, System.Object[]> secondaryComponents = new Dictionary<Type, System.Object[]>();
 
+        // TODO: Fix this, there is a bug when I try to just remove the component from the list, not sure why
+        int CountGameObjectInMainComponents(GameObject gameObject)
+        {
+            int countGameObject = 0;
+
+            for (int i = 0; i < mainComponents.Length; ++i)
+            {
+                if (mainComponents[i].gameObject.GetInstanceID() == gameObject.GetInstanceID())
+                    ++countGameObject;
+            }
+            return countGameObject;
+        }
+
+        void RemoveGameObjectsFromMainComponents(GameObject gameObject)
+        {
+            int countGameObjects = CountGameObjectInMainComponents(gameObject);
+
+            if (countGameObjects == 0)
+                return;
+            MonoBehaviour[] newBehaviours = new MonoBehaviour[countMainComponents - countGameObjects];
+            for (int i = 0, j = 0; i < countMainComponents; ++i)
+            {
+                if (mainComponents[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
+                {
+                    Debug.Log("NewB[" + j + "] equals to mainComponents["+i+"]");
+                    newBehaviours[j] = mainComponents[i];
+                    j++;
+                }
+            }
+            mainComponents = (MonoBehaviour[])newBehaviours.Clone();
+            countMainComponents = mainComponents.Length;
+        }
+
+        public void OnGameObjectInstantiated(GameObject gameObject)
+        {
+            // TODO: Eventually, only add the game object to the list of components that match
+            RefreshComponents();
+        }
+
         public void OnGameObjectPreDestroyed(GameObject gameObject)
         {
-            // TODO: Remove gameObject from mainComponents / secondaryComponents only where the type matches
+            // Debug.Log("Before: " + countMainComponents);
+            // for (int i = 0; i < countMainComponents; ++i)
+            // {
+            //     Debug.Log(mainComponents[i].gameObject.GetInstanceID());
+            // }
+            // RemoveGameObjectsFromMainComponents(gameObject);
+            // Debug.Log("After: " + countMainComponents);
+            // for (int i = 0; i < countMainComponents; ++i)
+            // {
+            //     Debug.Log(mainComponents[i].gameObject.GetInstanceID());
+            // }
+            // RefreshMainComponents();
         }
 
         public void OnGameObjectPostDestroyed(GameObject gameObject)
