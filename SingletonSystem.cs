@@ -6,24 +6,9 @@ namespace ChocolateECS
 {
     public abstract class SingletonSystem : ISystem
     {
-        public void OnGameObjectInstantiated(GameObject gameObject)
+        public ComponentManager ComponentManager
         {
-
-        }
-
-        public void OnGameObjectPreDestroyed(GameObject gameObject)
-        {
-
-        }
-
-        public void OnGameObjectPostDestroyed(GameObject gameObject)
-        {
-
-        }
-
-        public void RefreshComponents()
-        {
-            
+            get; set;
         }
 
         public virtual void OnAwake(List<ISystem> systems)

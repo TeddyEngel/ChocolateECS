@@ -6,10 +6,10 @@ namespace ChocolateECS
 {
     public interface ISystem
     {
-        void OnGameObjectInstantiated(GameObject gameObject);
-        void OnGameObjectPreDestroyed(GameObject gameObject);
-        void OnGameObjectPostDestroyed(GameObject gameObject);
-        void RefreshComponents();
+        ComponentManager ComponentManager
+        {
+            get; set;
+        }
 
         void OnAwake(List<ISystem> systems);
         void OnStart();

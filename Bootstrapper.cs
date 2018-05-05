@@ -15,6 +15,8 @@ namespace ChocolateECS
 {
     public abstract class Bootstrapper : MonoBehaviour
     {
+        ComponentManager componentManager = new ComponentManager();
+
         List<ISystem> allSystems = new List<ISystem>();
         int countAllSystems;
         List<ISystem> awakeSystems = new List<ISystem>();
@@ -36,56 +38,64 @@ namespace ChocolateECS
 
         public virtual void Awake()
         {
+            componentManager.OnAwake();
             for (int i = 0; i < countAwakeSystems; ++i)
                 awakeSystems[i].OnAwake(awakeSystems); // TODO: Is awake systems enough? Might want to pass all systems instead
     	}
 
         public virtual void Start()
         {
+            componentManager.OnStart();
             for (int i = 0; i < countStartSystems; ++i)
                 startSystems[i].OnStart();
         }
 
         public virtual void OnEnable()
         {
+            componentManager.OnEnable();
             for (int i = 0; i < countEnableSystems; ++i)
                 enableSystems[i].OnEnable();
         }
     	
     	public virtual void Update()
         {
+            componentManager.OnUpdate(Time.deltaTime);
             for (int i = 0; i < countUpdateSystems; ++i)
                 updateSystems[i].OnUpdate(Time.deltaTime);
     	}
 
         public virtual void LateUpdate()
         {
+            componentManager.OnLateUpdate(Time.deltaTime);
             for (int i = 0; i < countLateUpdateSystems; ++i)
                 lateUpdateSystems[i].OnLateUpdate(Time.deltaTime);
         }
 
         public virtual void FixedUpdate()
         {
+            componentManager.OnFixedUpdate();
             for (int i = 0; i < countFixedUpdateSystems; ++i)
                 fixedUpdateSystems[i].OnFixedUpdate();
         }
 
         public virtual void OnDisable()
         {
+            componentManager.OnDisable();
             for (int i = 0; i < countDisableSystems; ++i)
                 disableSystems[i].OnDisable();
         }
 
         public virtual void OnDestroy()
         {
+            componentManager.OnDestroy();
             for (int i = 0; i < countDestroySystems; ++i)
                 destroySystems[i].OnDestroy();
-            // NOTE: Might need to move that before OnDestroy if systems start destroying game objects when they get destroyed
-            UnregisterSystems();
         }
 
         protected void RegisterSystem(ISystem system)
         {
+            system.ComponentManager = componentManager;
+
             Type systemType = system.GetType();
 
             allSystems.Add(system);
@@ -139,30 +149,6 @@ namespace ChocolateECS
                 destroySystems.Add(system);
                 ++countDestroySystems;
             }
-
-            RegisterSystemHandlers(system);
-        }
-
-        void UnregisterSystems()
-        {
-            for (int i = 0; i < countAllSystems; ++i)
-            {
-                ISystem system = allSystems[i];
-
-                UnregisterSystemHandlers(system);
-            }
-        }
-
-        void RegisterSystemHandlers(ISystem system)
-        {
-            GameObjectFactory.OnGameObjectPreDestroyed += system.OnGameObjectPreDestroyed;
-            GameObjectFactory.OnGameObjectPostDestroyed += system.OnGameObjectPostDestroyed;
-        }
-
-        void UnregisterSystemHandlers(ISystem system)
-        {
-            GameObjectFactory.OnGameObjectPreDestroyed -= system.OnGameObjectPreDestroyed;
-            GameObjectFactory.OnGameObjectPostDestroyed -= system.OnGameObjectPostDestroyed;
         }
     }
 }
