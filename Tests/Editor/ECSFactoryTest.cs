@@ -6,12 +6,12 @@ using System;
 using System.Collections;
 using ChocolateECS;
 
-public class GameObjectFactoryTest
+public class ECSFactoryTest
 {
 	[Test]
 	public void Instantiate_WithNullGameObject_ThrowsArgumentException() 
 	{
-		Assert.Throws<ArgumentException>(() => { GameObjectFactory.Instantiate(null); });
+		Assert.Throws<ArgumentException>(() => { ECSFactory.Instantiate(null); });
 	}
 
 	[Test]
@@ -19,14 +19,14 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 
-		Assert.IsNotNull(GameObjectFactory.Instantiate(go));
+		Assert.IsNotNull(ECSFactory.Instantiate(go));
 	}
 
 	[Test]
 	public void Instantiate_WithValidGameObject_ReturnsANewGameObject() 
 	{
 		GameObject go = new GameObject();
-		GameObject newGo = GameObjectFactory.Instantiate(go);
+		GameObject newGo = ECSFactory.Instantiate(go);
 
 		Assert.AreNotEqual(go.GetInstanceID(), newGo.GetInstanceID());
 	}
@@ -36,11 +36,11 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		bool eventTriggered = false;
-		GameObjectFactory.OnGameObjectInstantiated += (eventGo) => {
+		ECSFactory.OnGameObjectInstantiated += (eventGo) => {
 			eventTriggered = true;
 		};
 		
-		GameObject newGo = GameObjectFactory.Instantiate(go);
+		GameObject newGo = ECSFactory.Instantiate(go);
 
 		Assert.IsTrue(eventTriggered);
 	}
@@ -50,17 +50,17 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		
-		GameObjectFactory.OnGameObjectInstantiated += (eventGo) => {
+		ECSFactory.OnGameObjectInstantiated += (eventGo) => {
 			Assert.AreNotEqual(go.GetInstanceID(), eventGo.GetInstanceID());
 		};
 		
-		GameObject newGo = GameObjectFactory.Instantiate(go);
+		GameObject newGo = ECSFactory.Instantiate(go);
 	}
 
 	[Test]
 	public void DestroyImmediate_WithNullGameObject_ThrowsArgumentException() 
 	{
-		Assert.Throws<ArgumentException>(() => { GameObjectFactory.DestroyImmediate(null); });
+		Assert.Throws<ArgumentException>(() => { ECSFactory.DestroyImmediate(null); });
 	}
 
 	// TODO: This test doesn't seem to evaluate correctly
@@ -69,7 +69,7 @@ public class GameObjectFactoryTest
 	// {
 	// 	GameObject go = new GameObject();
 
-	// 	GameObjectFactory.DestroyImmediate(go);
+	// 	ECSFactory.DestroyImmediate(go);
 
 	// 	Assert.AreEqual(go, null);
 	// }
@@ -79,11 +79,11 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		bool eventTriggered = false;
-		GameObjectFactory.OnGameObjectPreDestroyed += (eventGo) => {
+		ECSFactory.OnGameObjectPreDestroyed += (eventGo) => {
 			eventTriggered = true;
 		};
 		
-		GameObjectFactory.DestroyImmediate(go);
+		ECSFactory.DestroyImmediate(go);
 
 		Assert.IsTrue(eventTriggered);
 	}
@@ -93,11 +93,11 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		
-		GameObjectFactory.OnGameObjectPreDestroyed += (eventGo) => {
+		ECSFactory.OnGameObjectPreDestroyed += (eventGo) => {
 			Assert.AreEqual(go.GetInstanceID(), eventGo.GetInstanceID());
 		};
 		
-		GameObjectFactory.DestroyImmediate(go);
+		ECSFactory.DestroyImmediate(go);
 	}
 
 	[Test]
@@ -105,11 +105,11 @@ public class GameObjectFactoryTest
 	{
 		GameObject go = new GameObject();
 		bool eventTriggered = false;
-		GameObjectFactory.OnGameObjectPostDestroyed += (eventGo) => {
+		ECSFactory.OnGameObjectPostDestroyed += (eventGo) => {
 			eventTriggered = true;
 		};
 		
-		GameObjectFactory.DestroyImmediate(go);
+		ECSFactory.DestroyImmediate(go);
 
 		Assert.IsTrue(eventTriggered);
 	}
@@ -120,11 +120,11 @@ public class GameObjectFactoryTest
 	// {
 	// 	GameObject go = new GameObject();
 		
-	// 	GameObjectFactory.OnGameObjectPostDestroyed += (eventGo) => {
+	// 	ECSFactory.OnGameObjectPostDestroyed += (eventGo) => {
 	// 		Assert.AreEqual(go.GetInstanceID(), eventGo.GetInstanceID());
 	// 	};
 		
-	// 	GameObjectFactory.DestroyImmediate(go);
+	// 	ECSFactory.DestroyImmediate(go);
 	// }
 }
 

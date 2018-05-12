@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ChocolateECS
 {
-    public class GameObjectFactory
+    public class ECSFactory
     {
         public static Action<GameObject> OnGameObjectInstantiated;
         public static Action<GameObject> OnGameObjectPreDestroyed;

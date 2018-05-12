@@ -11,6 +11,16 @@ namespace ChocolateECS
         Dictionary<Type, Dictionary<Type, List<Component>>> _secondaryComponents = new Dictionary<Type, Dictionary<Type, List<Component>>>();
         List<Type> _types = new List<Type>();
 
+        public ComponentManager()
+        {
+            RegisterFactoryHandlers();
+        }
+
+        ~ComponentManager()
+        {
+            UnregisterFactoryHandlers();
+        }
+
         public void OnGameObjectInstantiated(GameObject gameObject)
         {
             AddGameObjectMainComponents(gameObject);
@@ -38,6 +48,7 @@ namespace ChocolateECS
             // Clear previous data
             _components.Clear();
             _secondaryComponents.Clear();
+            _types.Clear();
 
             // Get all gameobjects
             var foundObjects = GameObject.FindObjectsOfType<GameObject>();
@@ -89,12 +100,12 @@ namespace ChocolateECS
         {
             var gameObjectComponents = gameObject.GetComponents(typeof(Component));
 
-            for (int i = 0; i < _types.Count; ++i)
+            for (int i = 0; i < gameObjectComponents.Length; ++i)
             {
-                Type mainComponentType = _types[i];
-
                 for (int j = 0; j < gameObjectComponents.Length; ++j)
-                    AddSecondaryComponent(mainComponentType, gameObjectComponents[j]);
+                {
+                    AddSecondaryComponent(gameObjectComponents[i].GetType(), gameObjectComponents[j]);
+                }
             }
         }
 
@@ -102,11 +113,14 @@ namespace ChocolateECS
         {
             Type secondaryComponentType = secondaryComponent.GetType();
 
+            if (mainComponentType == secondaryComponentType)
+                return;
             if (!_secondaryComponents.ContainsKey(mainComponentType))
                 _secondaryComponents.Add(mainComponentType, new Dictionary<Type, List<Component>>());
             if (!_secondaryComponents[mainComponentType].ContainsKey(secondaryComponentType))
                 _secondaryComponents[mainComponentType].Add(secondaryComponentType, new List<Component>());
-            _secondaryComponents[mainComponentType][secondaryComponentType].Add(secondaryComponent);
+            if (!_secondaryComponents[mainComponentType][secondaryComponentType].Contains(secondaryComponent))
+                _secondaryComponents[mainComponentType][secondaryComponentType].Add(secondaryComponent);
         }
 
         void RemoveSecondaryComponent(Type mainComponentType, Component secondaryComponent)
@@ -125,25 +139,19 @@ namespace ChocolateECS
 
         void RegisterFactoryHandlers()
         {
-            GameObjectFactory.OnGameObjectInstantiated += OnGameObjectInstantiated;
-            GameObjectFactory.OnGameObjectPreDestroyed += OnGameObjectPreDestroyed;
-            GameObjectFactory.OnGameObjectPostDestroyed += OnGameObjectPostDestroyed;
+            ECSFactory.OnGameObjectInstantiated += OnGameObjectInstantiated;
+            ECSFactory.OnGameObjectPreDestroyed += OnGameObjectPreDestroyed;
+            ECSFactory.OnGameObjectPostDestroyed += OnGameObjectPostDestroyed;
         }
 
         void UnregisterFactoryHandlers()
         {
-            GameObjectFactory.OnGameObjectInstantiated -= OnGameObjectInstantiated;
-            GameObjectFactory.OnGameObjectPreDestroyed -= OnGameObjectPreDestroyed;
-            GameObjectFactory.OnGameObjectPostDestroyed -= OnGameObjectPostDestroyed;
+            ECSFactory.OnGameObjectInstantiated -= OnGameObjectInstantiated;
+            ECSFactory.OnGameObjectPreDestroyed -= OnGameObjectPreDestroyed;
+            ECSFactory.OnGameObjectPostDestroyed -= OnGameObjectPostDestroyed;
         }
 
         public void OnAwake()
-        {
-            RefreshComponents();
-        }
-
-        // Called after all the other systems have been awoken
-        public void OnPostAwake()
         {
             RefreshComponents();
         }
@@ -154,7 +162,6 @@ namespace ChocolateECS
 
         public void OnEnable()
         {
-            RegisterFactoryHandlers();
         }
 
         public void OnUpdate(float deltaTime)
@@ -174,7 +181,6 @@ namespace ChocolateECS
 
         public void OnDisable()
         {
-            UnregisterFactoryHandlers();
         }
 
         public void OnDestroy()
