@@ -6,9 +6,9 @@ namespace ChocolateECS
 {
     public class ComponentManager
     {
-        List<Component> _emptyList = new List<Component>(); // Just used for empty returns
-        Dictionary<Type, List<Component>> _components = new Dictionary<Type, List<Component>>();
-        Dictionary<Type, Dictionary<Type, List<Component>>> _secondaryComponents = new Dictionary<Type, Dictionary<Type, List<Component>>>();
+        List<IComponent> _emptyList = new List<IComponent>(); // Just used for empty returns
+        Dictionary<Type, List<IComponent>> _components = new Dictionary<Type, List<IComponent>>();
+        Dictionary<Type, Dictionary<Type, List<IComponent>>> _secondaryComponents = new Dictionary<Type, Dictionary<Type, List<IComponent>>>();
         List<Type> _types = new List<Type>();
 
         public ComponentManager()
@@ -29,13 +29,17 @@ namespace ChocolateECS
 
         public void OnGameObjectPreDestroyed(GameObject gameObject)
         {
-            var gameObjectComponents = gameObject.GetComponents(typeof(Component));
+            var gameObjectComponents = gameObject.GetComponents(typeof(IComponent));
 
             for (int i = 0; i < gameObjectComponents.Length; ++i)
             {
-                for (int j = 0; j < _types.Count; ++j)
-                    RemoveSecondaryComponent(_types[j], gameObjectComponents[i]);
-                RemoveMainComponent(gameObjectComponents[i]);
+                for (int j = 0; j < gameObjectComponents.Length; ++j)
+                {
+                    if (i == j)
+                        continue;
+                    RemoveSecondaryComponent((gameObjectComponents[i]).GetType(), (IComponent)gameObjectComponents[j]);
+                }
+                RemoveMainComponent((IComponent)gameObjectComponents[i]);
             }
         }
 
@@ -63,26 +67,26 @@ namespace ChocolateECS
 
         void AddGameObjectMainComponents(GameObject gameObject)
         {
-            var gameObjectComponents = gameObject.GetComponents(typeof(Component));
+            var gameObjectComponents = gameObject.GetComponents(typeof(IComponent));
 
             for (int i = 0; i < gameObjectComponents.Length; ++i)
-                AddMainComponent(gameObjectComponents[i]);
+                AddMainComponent((IComponent)gameObjectComponents[i]);
         }
 
-        void AddMainComponent(Component mainComponent)
+        void AddMainComponent(IComponent mainComponent)
         {
             Type mainComponentType = mainComponent.GetType();
 
             if (!_components.ContainsKey(mainComponentType))
             {
-                _components.Add(mainComponentType, new List<Component>());
+                _components.Add(mainComponentType, new List<IComponent>());
                 if (!_types.Contains(mainComponentType))
                     _types.Add(mainComponentType);
             }
             _components[mainComponentType].Add(mainComponent);
         }
 
-        void RemoveMainComponent(Component mainComponent)
+        void RemoveMainComponent(IComponent mainComponent)
         {
             Type mainComponentType = mainComponent.GetType();
 
@@ -98,32 +102,34 @@ namespace ChocolateECS
 
         void AddGameObjectSecondaryComponents(GameObject gameObject)
         {
-            var gameObjectComponents = gameObject.GetComponents(typeof(Component));
+            var gameObjectComponents = gameObject.GetComponents(typeof(IComponent));
 
             for (int i = 0; i < gameObjectComponents.Length; ++i)
             {
                 for (int j = 0; j < gameObjectComponents.Length; ++j)
                 {
-                    AddSecondaryComponent(gameObjectComponents[i].GetType(), gameObjectComponents[j]);
+                    if (i == j)
+                        continue;
+                    AddSecondaryComponent(gameObjectComponents[i].GetType(), (IComponent)gameObjectComponents[j]);
                 }
             }
         }
 
-        void AddSecondaryComponent(Type mainComponentType, Component secondaryComponent)
+        void AddSecondaryComponent(Type mainComponentType, IComponent secondaryComponent)
         {
             Type secondaryComponentType = secondaryComponent.GetType();
 
             if (mainComponentType == secondaryComponentType)
                 return;
             if (!_secondaryComponents.ContainsKey(mainComponentType))
-                _secondaryComponents.Add(mainComponentType, new Dictionary<Type, List<Component>>());
+                _secondaryComponents.Add(mainComponentType, new Dictionary<Type, List<IComponent>>());
             if (!_secondaryComponents[mainComponentType].ContainsKey(secondaryComponentType))
-                _secondaryComponents[mainComponentType].Add(secondaryComponentType, new List<Component>());
+                _secondaryComponents[mainComponentType].Add(secondaryComponentType, new List<IComponent>());
             if (!_secondaryComponents[mainComponentType][secondaryComponentType].Contains(secondaryComponent))
                 _secondaryComponents[mainComponentType][secondaryComponentType].Add(secondaryComponent);
         }
 
-        void RemoveSecondaryComponent(Type mainComponentType, Component secondaryComponent)
+        void RemoveSecondaryComponent(Type mainComponentType, IComponent secondaryComponent)
         {
             if (!_secondaryComponents.ContainsKey(mainComponentType))
                 return;
@@ -193,7 +199,7 @@ namespace ChocolateECS
             return GetComponents(type).Count;
         }
 
-        public List<Component> GetComponents(Type type)
+        public List<IComponent> GetComponents(Type type)
         {
             if (type == null)
                 throw new ArgumentException();
@@ -202,7 +208,7 @@ namespace ChocolateECS
             return _components[type];
         }
 
-        public List<Component> GetDualComponents(Type mainType, Type secondaryType)
+        public List<IComponent> GetDualComponents(Type mainType, Type secondaryType)
         {
             if (mainType == null
                 || secondaryType == null)
