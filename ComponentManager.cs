@@ -9,7 +9,6 @@ namespace ChocolateECS
         List<IComponent> _emptyList = new List<IComponent>(); // Just used for empty returns
         Dictionary<Type, List<IComponent>> _components = new Dictionary<Type, List<IComponent>>();
         Dictionary<Type, Dictionary<Type, List<IComponent>>> _secondaryComponents = new Dictionary<Type, Dictionary<Type, List<IComponent>>>();
-        List<Type> _types = new List<Type>();
 
         public ComponentManager()
         {
@@ -52,7 +51,6 @@ namespace ChocolateECS
             // Clear previous data
             _components.Clear();
             _secondaryComponents.Clear();
-            _types.Clear();
 
             // Get all gameobjects
             var foundObjects = GameObject.FindObjectsOfType<GameObject>();
@@ -78,11 +76,7 @@ namespace ChocolateECS
             Type mainComponentType = mainComponent.GetType();
 
             if (!_components.ContainsKey(mainComponentType))
-            {
                 _components.Add(mainComponentType, new List<IComponent>());
-                if (!_types.Contains(mainComponentType))
-                    _types.Add(mainComponentType);
-            }
             _components[mainComponentType].Add(mainComponent);
         }
 
@@ -94,10 +88,7 @@ namespace ChocolateECS
                 return;
             _components[mainComponentType].Remove(mainComponent);
             if (_components[mainComponentType].Count == 0)
-            {
                 _components.Remove(mainComponentType);
-                _types.Remove(mainComponentType);
-            }
         }
 
         void AddGameObjectSecondaryComponents(GameObject gameObject)
