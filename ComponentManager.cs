@@ -41,7 +41,6 @@ namespace ChocolateECS
 
             // Get all gameobjects
             var foundObjects = GameObject.FindObjectsOfType<GameObject>();
-            Debug.Log("Found " + foundObjects.Length);
 
             // Create the main lists of _components
             for (int i = 0; i < foundObjects.Length; ++i)
