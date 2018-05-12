@@ -17,8 +17,6 @@ namespace ChocolateECS
     {
         ComponentManager componentManager = new ComponentManager();
 
-        List<ISystem> allSystems = new List<ISystem>();
-        int countAllSystems;
         List<ISystem> awakeSystems = new List<ISystem>();
         int countAwakeSystems;
         List<ISystem> startSystems = new List<ISystem>();
@@ -97,9 +95,6 @@ namespace ChocolateECS
             system.ComponentManager = componentManager;
 
             Type systemType = system.GetType();
-
-            allSystems.Add(system);
-            ++countAllSystems;
 
             MethodInfo awakeInfo = systemType.GetMethod("OnAwake", BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(List<ISystem> )}, null);
             if (awakeInfo != null && ReflectionUtilities.IsOverride(awakeInfo))

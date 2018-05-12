@@ -184,6 +184,8 @@ namespace ChocolateECS
 
         public List<Component> GetComponents(Type type)
         {
+            if (type == null)
+                throw new ArgumentException();
             if (!_components.ContainsKey(type))
                 return _emptyList;
             return _components[type];
@@ -191,6 +193,23 @@ namespace ChocolateECS
 
         public List<Component> GetSecondaryComponents(Type mainType, Type secondaryType)
         {
+            if (mainType == null
+                || secondaryType == null)
+                throw new ArgumentException();
+            if (!_secondaryComponents.ContainsKey(mainType))
+                return _emptyList;
+            if (!_secondaryComponents[mainType].ContainsKey(secondaryType))
+                return _emptyList;
+            return _secondaryComponents[mainType][secondaryType];
+        }
+
+        public List<Component> GetDualComponents(Type mainType, Type secondaryType)
+        {
+            if (mainType == null
+                || secondaryType == null)
+                throw new ArgumentException();
+            if (mainType == secondaryType)
+                return _emptyList;
             if (!_secondaryComponents.ContainsKey(mainType))
                 return _emptyList;
             if (!_secondaryComponents[mainType].ContainsKey(secondaryType))
