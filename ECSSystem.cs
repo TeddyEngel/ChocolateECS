@@ -163,7 +163,7 @@ namespace ChocolateECS
         }
 
         
-        protected SecondaryComponentType[] GetSecondaryComponents<SecondaryComponentType>()
+        protected SecondaryComponentType[] GetDualComponents<SecondaryComponentType>()
         {
             Type classType = typeof(SecondaryComponentType);
             if (!secondaryComponents.ContainsKey(classType))
