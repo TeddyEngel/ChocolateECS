@@ -41,6 +41,7 @@ namespace ChocolateECS
 
             // Get all gameobjects
             var foundObjects = GameObject.FindObjectsOfType<GameObject>();
+            Debug.Log("Found " + foundObjects.Length);
 
             // Create the main lists of _components
             for (int i = 0; i < foundObjects.Length; ++i)
@@ -142,9 +143,14 @@ namespace ChocolateECS
             RefreshComponents();
         }
 
+        // Called after all the other systems have been awoken
+        public void OnPostAwake()
+        {
+            RefreshComponents();
+        }
+
         public void OnStart()
         {
-            
         }
 
         public void OnEnable()

@@ -39,6 +39,7 @@ namespace ChocolateECS
             componentManager.OnAwake();
             for (int i = 0; i < countAwakeSystems; ++i)
                 awakeSystems[i].OnAwake(awakeSystems); // TODO: Is awake systems enough? Might want to pass all systems instead
+            componentManager.OnPostAwake();
     	}
 
         public virtual void Start()
